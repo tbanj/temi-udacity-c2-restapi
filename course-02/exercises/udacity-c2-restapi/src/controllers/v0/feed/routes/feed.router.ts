@@ -10,7 +10,7 @@ router.get('/', async (req: Request, res: Response) => {
     // const items = await FeedItem.findAndCountAll({order: [['id', 'DESC']]});
     // typescript equivalent
     const items: { count: number, rows: FeedItem[] } = await FeedItem.findAndCountAll({ order: [['id', 'DESC']] });
-    items.rows.map((item) => {
+    items.rows.map((item: any) => {
         if (item.url) {
             item.url = AWS.getGetSignedUrl(item.url);
         }
@@ -74,7 +74,8 @@ router.get('/signed-url/:fileName',
     requireAuth,
     async (req: Request, res: Response) => {
         let { fileName } = req.params;
-        const url = AWS.getPutSignedUrl(fileName);
+        const url = await AWS.getPutSignedUrl(fileName);
+        console.log('url', url)
         res.status(201).send({ url: url });
     });
 
@@ -102,7 +103,7 @@ router.post('/',
             url: fileName
         });
 
-        const saved_item = await item.save();
+        const saved_item: any = await item.save();
 
         saved_item.url = AWS.getGetSignedUrl(saved_item.url);
         res.status(201).send(saved_item);
